@@ -149,17 +149,28 @@ export function FormWizard() {
 
   if (isSubmitted) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
+      <div className="max-w-2xl mx-auto p-6" role="alert" aria-live="polite">
         <div className="text-center space-y-6">
-          <CheckCircle className="w-16 h-16 text-green-600 mx-auto" />
+          <CheckCircle
+            className="w-16 h-16 text-green-600 mx-auto"
+            aria-hidden="true"
+          />
           <h2 className="text-2xl font-bold text-gray-900">
             {t("general.success")}
           </h2>
           <p className="text-gray-600">
             {t("submission.applicationId")}:{" "}
-            <span className="font-mono font-semibold">{applicationId}</span>
+            <span
+              className="font-mono font-semibold"
+              aria-label={`Application ID: ${applicationId}`}
+            >
+              {applicationId}
+            </span>
           </p>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div
+            className="bg-green-50 border border-green-200 rounded-lg p-4"
+            role="status"
+          >
             <p className="text-green-800 text-sm">
               {t("submission.confirmationMessage")}
             </p>
@@ -173,13 +184,24 @@ export function FormWizard() {
     <div className="max-w-4xl mx-auto p-6">
       <ProgressBar />
 
-      <div className="bg-white rounded-lg shadow-lg p-8">
+      <div
+        className="bg-white rounded-lg shadow-lg p-8"
+        role="form"
+        aria-label="Financial Assistance Application Form"
+      >
         {renderStep()}
 
         {/* Show submission error if any */}
         {submissionError && (
-          <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg mt-6">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div
+            className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg mt-6"
+            role="alert"
+            aria-live="assertive"
+          >
+            <AlertCircle
+              className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
+              aria-hidden="true"
+            />
             <div>
               <p className="text-sm text-red-800 font-medium">
                 {t("validation.error")}
@@ -189,16 +211,22 @@ export function FormWizard() {
           </div>
         )}
 
-        <div className={`gap-x-4 flex justify-between mt-8`}>
+        <div
+          className={`gap-x-4 flex justify-between mt-8`}
+          role="navigation"
+          aria-label="Form navigation"
+        >
           <button
             onClick={handlePrevious}
             disabled={state.currentStep === 1}
             className={`flex items-center gap-2 px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+            aria-label={t("nav.previous")}
+            aria-disabled={state.currentStep === 1}
           >
             {isRTL ? (
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" aria-hidden="true" />
             ) : (
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             )}
             {t("nav.previous")}
           </button>
@@ -207,12 +235,13 @@ export function FormWizard() {
             <button
               onClick={handleNext}
               className={`flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors`}
+              aria-label={t("nav.next")}
             >
               {t("nav.next")}
               {isRTL ? (
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4" aria-hidden="true" />
               ) : (
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4" aria-hidden="true" />
               )}
             </button>
           ) : (
@@ -222,15 +251,22 @@ export function FormWizard() {
               className={`flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                 isRTL ? "flex-row-reverse" : ""
               }`}
+              aria-label={
+                state.isSubmitting ? t("general.loading") : t("nav.submit")
+              }
+              aria-disabled={state.isSubmitting}
             >
               {state.isSubmitting ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div
+                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+                    aria-hidden="true"
+                  />
                   {t("general.loading")}
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" />
+                  <Send className="w-4 h-4" aria-hidden="true" />
                   {t("nav.submit")}
                 </>
               )}
