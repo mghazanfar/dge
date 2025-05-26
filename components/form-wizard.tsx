@@ -36,7 +36,8 @@ export function FormWizard() {
     }
   };
 
-  const handleNext = async () => {
+  const handleNext = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const currentForm = getCurrentForm();
     const isValid = await currentForm.trigger();
 
@@ -58,7 +59,8 @@ export function FormWizard() {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const isValid = await situationForm.trigger();
 
     if (!isValid) {
@@ -184,10 +186,10 @@ export function FormWizard() {
     <div className="max-w-4xl mx-auto p-6">
       <ProgressBar />
 
-      <div
+      <form
         className="bg-white rounded-lg shadow-lg p-8"
-        role="form"
         aria-label="Financial Assistance Application Form"
+        onSubmit={state.currentStep < 3 ? handleNext : handleSubmit}
       >
         {renderStep()}
 
@@ -217,6 +219,7 @@ export function FormWizard() {
           aria-label="Form navigation"
         >
           <button
+            type="button"
             onClick={handlePrevious}
             disabled={state.currentStep === 1}
             className={`flex items-center gap-2 px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
@@ -233,9 +236,9 @@ export function FormWizard() {
 
           {state.currentStep < 3 ? (
             <button
-              onClick={handleNext}
               className={`flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors`}
               aria-label={t("nav.next")}
+              type="submit"
             >
               {t("nav.next")}
               {isRTL ? (
@@ -246,7 +249,7 @@ export function FormWizard() {
             </button>
           ) : (
             <button
-              onClick={handleSubmit}
+              type="submit"
               disabled={state.isSubmitting}
               className={`flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                 isRTL ? "flex-row-reverse" : ""
@@ -273,7 +276,7 @@ export function FormWizard() {
             </button>
           )}
         </div>
-      </div>
+      </form>
     </div>
   );
 }

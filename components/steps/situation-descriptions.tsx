@@ -14,11 +14,23 @@ import {
   Key,
 } from "lucide-react";
 
+type FormFieldKey =
+  | "currentFinancialSituation"
+  | "employmentCircumstances"
+  | "reasonForApplying";
+type SituationFieldKey = FormFieldKey | "";
+
+interface FieldState {
+  lastError: string;
+  lastSuccess: string;
+  debugInfo: string;
+  currentSuggestion: string;
+}
+
 export function SituationDescriptions() {
   const { situationForm } = useForm();
   const { t, isRTL, language } = useLanguage();
-  const { generateSuggestion, isLoading, suggestion, error } =
-    useAIAssistance();
+  const { generateSuggestion, isLoading, suggestion } = useAIAssistance();
 
   const {
     register,
@@ -28,16 +40,11 @@ export function SituationDescriptions() {
   } = situationForm;
 
   // Separate state for each field to prevent linking
-  const [activeField, setActiveField] = useState<string>("");
+  const [activeField, setActiveField] = useState<SituationFieldKey>("");
   const [showModal, setShowModal] = useState(false);
-  const [fieldStates, setFieldStates] = useState<{
-    [key: string]: {
-      lastError: string;
-      lastSuccess: string;
-      debugInfo: string;
-      currentSuggestion: string;
-    };
-  }>({
+  const [fieldStates, setFieldStates] = useState<
+    Record<FormFieldKey, FieldState>
+  >({
     currentFinancialSituation: {
       lastError: "",
       lastSuccess: "",
@@ -59,8 +66,8 @@ export function SituationDescriptions() {
   });
 
   const updateFieldState = (
-    fieldKey: string,
-    updates: Partial<(typeof fieldStates)[string]>
+    fieldKey: FormFieldKey,
+    updates: Partial<FieldState>
   ) => {
     setFieldStates((prev) => ({
       ...prev,
@@ -68,12 +75,7 @@ export function SituationDescriptions() {
     }));
   };
 
-  const handleAIAssistance = async (
-    fieldType:
-      | "currentFinancialSituation"
-      | "employmentCircumstances"
-      | "reasonForApplying"
-  ) => {
+  const handleAIAssistance = async (fieldType: FormFieldKey) => {
     console.log("=== Grok-3 AI Assistance Button Clicked ===");
     console.log("Field type:", fieldType);
 
@@ -125,27 +127,35 @@ export function SituationDescriptions() {
   };
 
   const handleAcceptSuggestion = (text: string) => {
-    setValue(activeField as keyof typeof fieldStates, text);
-    setShowModal(false);
-    updateFieldState(activeField, {
-      lastError: "",
-      lastSuccess: "",
-      debugInfo: t("ai.suggestion.accepted"),
-    });
-    setActiveField("");
+    if (activeField && activeField in fieldStates) {
+      setValue(activeField, text);
+      setShowModal(false);
+      updateFieldState(activeField, {
+        lastError: "",
+        lastSuccess: "",
+        debugInfo: t("ai.suggestion.accepted"),
+      });
+      setActiveField("");
+    }
   };
 
   const handleDiscardSuggestion = () => {
     setShowModal(false);
-    updateFieldState(activeField, {
-      lastError: "",
-      lastSuccess: "",
-      debugInfo: t("ai.suggestion.discarded"),
-    });
+    if (activeField && activeField in fieldStates) {
+      updateFieldState(activeField, {
+        lastError: "",
+        lastSuccess: "",
+        debugInfo: t("ai.suggestion.discarded"),
+      });
+    }
     setActiveField("");
   };
 
-  const fields = [
+  const fields: Array<{
+    key: FormFieldKey;
+    label: string;
+    placeholder: string;
+  }> = [
     {
       key: "currentFinancialSituation",
       label: t("situation.currentFinancial"),
@@ -202,8 +212,9 @@ export function SituationDescriptions() {
           </div>
           <div>
             {t("ai.debug.status")}:{" "}
-            {activeField
-              ? fieldStates[activeField]?.debugInfo || t("ai.debug.ready")
+            {activeField && activeField in fieldStates
+              ? fieldStates[activeField as FormFieldKey]?.debugInfo ||
+                t("ai.debug.ready")
               : t("ai.debug.ready")}
           </div>
           <div className="text-xs text-purple-600 mt-2">
@@ -223,14 +234,7 @@ export function SituationDescriptions() {
             </label>
             <button
               type="button"
-              onClick={() =>
-                handleAIAssistance(
-                  field.key as
-                    | "currentFinancialSituation"
-                    | "employmentCircumstances"
-                    | "reasonForApplying"
-                )
-              }
+              onClick={() => handleAIAssistance(field.key)}
               disabled={isLoading && activeField === field.key}
               aria-label={`${t("situation.helpMeWrite")} ${field.label}`}
               aria-disabled={isLoading && activeField === field.key}
@@ -252,9 +256,9 @@ export function SituationDescriptions() {
           <textarea
             id={field.key}
             aria-required="true"
-            aria-invalid={!!errors[field.key as keyof typeof errors]}
+            aria-invalid={!!errors[field.key]}
             aria-describedby={`${field.key}-error ${field.key}-success`}
-            {...register(field.key as keyof typeof fieldStates, {
+            {...register(field.key, {
               required: t("validation.required"),
               minLength: {
                 value: 10,
@@ -264,15 +268,13 @@ export function SituationDescriptions() {
             placeholder={field.placeholder}
             rows={6}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none ${
-              errors[field.key as keyof typeof errors]
-                ? "border-red-500"
-                : "border-gray-300"
+              errors[field.key] ? "border-red-500" : "border-gray-300"
             } ${isRTL ? "text-right" : "text-left"}`}
             dir={isRTL ? "rtl" : "ltr"}
           />
 
           {/* Show validation error */}
-          {errors[field.key as keyof typeof errors] && (
+          {errors[field.key] && (
             <div
               className="flex items-center gap-1 mt-1"
               id={`${field.key}-error`}
@@ -283,64 +285,71 @@ export function SituationDescriptions() {
                 aria-hidden="true"
               />
               <span className="text-sm text-red-600">
-                {errors[field.key as keyof typeof errors]?.message}
+                {errors[field.key]?.message}
               </span>
             </div>
           )}
 
           {/* Show success message */}
-          {fieldStates[field.key]?.lastSuccess && (
-            <div
-              className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg"
-              id={`${field.key}-success`}
-              role="status"
-            >
-              <CheckCircle
-                className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5"
-                aria-hidden="true"
-              />
-              <div>
-                <p className="text-sm text-green-800 font-medium">
-                  {t("ai.success.title")}
-                </p>
-                <p className="text-sm text-green-700">
-                  {fieldStates[field.key].lastSuccess}
-                </p>
+          {field.key === activeField &&
+            activeField in fieldStates &&
+            fieldStates[field.key]?.lastSuccess && (
+              <div
+                className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg"
+                id={`${field.key}-success`}
+                role="status"
+              >
+                <CheckCircle
+                  className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
+                <div>
+                  <p className="text-sm text-green-800 font-medium">
+                    {t("ai.success.title")}
+                  </p>
+                  <p className="text-sm text-green-700">
+                    {fieldStates[field.key].lastSuccess}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Show error message */}
-          {fieldStates[field.key]?.lastError && (
-            <div
-              className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg"
-              id={`${field.key}-error`}
-              role="alert"
-            >
-              <AlertCircle
-                className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
-                aria-hidden="true"
-              />
-              <div>
-                <p className="text-sm text-red-800 font-medium">
-                  {t("ai.error.title")}
-                </p>
-                <p className="text-sm text-red-700">
-                  {fieldStates[field.key].lastError}
-                </p>
-                <p className="text-xs text-red-600 mt-1">
-                  {t("ai.tryAgainLater")}
-                </p>
+          {field.key === activeField &&
+            activeField in fieldStates &&
+            fieldStates[field.key]?.lastError && (
+              <div
+                className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg"
+                id={`${field.key}-error`}
+                role="alert"
+              >
+                <AlertCircle
+                  className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
+                <div>
+                  <p className="text-sm text-red-800 font-medium">
+                    {t("ai.error.title")}
+                  </p>
+                  <p className="text-sm text-red-700">
+                    {fieldStates[field.key].lastError}
+                  </p>
+                  <p className="text-xs text-red-600 mt-1">
+                    {t("ai.tryAgainLater")}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       ))}
 
       <AISuggestionModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        suggestion={fieldStates[activeField]?.currentSuggestion || suggestion}
+        suggestion={
+          fieldStates[activeField as FormFieldKey]?.currentSuggestion ||
+          suggestion
+        }
         onAccept={handleAcceptSuggestion}
         onDiscard={handleDiscardSuggestion}
       />
