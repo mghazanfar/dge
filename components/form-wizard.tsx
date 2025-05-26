@@ -189,17 +189,11 @@ export function FormWizard() {
           </div>
         )}
 
-        <div
-          className={`gap-x-4 flex justify-between mt-8 ${
-            isRTL ? "flex-row-reverse" : ""
-          }`}
-        >
+        <div className={`gap-x-4 flex justify-between mt-8`}>
           <button
             onClick={handlePrevious}
             disabled={state.currentStep === 1}
-            className={`flex items-center gap-2 px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-              isRTL ? "flex-row-reverse" : ""
-            }`}
+            className={`flex items-center gap-2 px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {isRTL ? (
               <ChevronRight className="w-4 h-4" />
@@ -212,9 +206,7 @@ export function FormWizard() {
           {state.currentStep < 3 ? (
             <button
               onClick={handleNext}
-              className={`flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors ${
-                isRTL ? "flex-row-reverse" : ""
-              }`}
+              className={`flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors`}
             >
               {t("nav.next")}
               {isRTL ? (

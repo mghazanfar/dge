@@ -52,36 +52,23 @@ A comprehensive multi-step form wizard for financial assistance applications wit
 
 ### Installation
 
-1. Clone the repository:
-   \`\`\`bash
-   git clone <repository-url>
-   cd financial-assistance-app
-   \`\`
+1. Clone the repository
 
-1. Clone the repository:
+2. Install dependencies:
    \`\`\`bash
-   git clone <repository-url>
-   cd financial-assistance-app
+   npm install or yarn install
    \`\`\`
 
-1. Install dependencies:
-   \`\`\`bash
-   npm install
-   \`\`\`
+3. Set up environment variables:
 
-1. Set up environment variables:
-   \`\`\`bash
-   cp .env.example .env.local
-   \`\`\`
-
-Add your GROKAI API key to `.env.local`:
+Add your GROKAI API key to `.env`:
 \`\`\`
 GROK_API_KEY=your_grokai_api_key_here
 \`\`\`
 
 4. Run the development server:
    \`\`\`bash
-   npm run dev
+   npm run dev or yarn dev
    \`\`\`
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -245,7 +232,6 @@ The project follows these standards:
 - TypeScript for type safety
 - ESLint for code quality
 - Prettier for code formatting
-- Semantic commit messages
 
 ## Deployment
 
@@ -324,4 +310,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Support
 
-For questions or support, please contact [your-email@example.com](mailto:your-email@example.com).
+For questions or support, please contact [ghazanfar89@gmail.com](mailto:ghazanfar89@gmail.com).
