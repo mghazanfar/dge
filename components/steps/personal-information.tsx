@@ -211,7 +211,10 @@ export function PersonalInformation() {
               validate: validateNationalId,
               onChange: (e) => {
                 const formatted = formatNationalId(e.target.value);
-                setValue("nationalId", formatted);
+                setValue("nationalId", formatted, {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                });
               },
             })}
             placeholder={`784-${
