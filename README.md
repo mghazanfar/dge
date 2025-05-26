@@ -113,12 +113,41 @@ GROK_API_KEY=your_grokai_api_key_here
 ### Step 1: Personal Information
 
 - Full Name
-- National ID
+- National ID (15 digits, must start with "784" and include birth year)
 - Date of Birth
 - Gender
 - Address (Street, City, State, Country)
 - Phone Number
 - Email Address
+
+### Form Validation
+
+The application includes comprehensive form validation:
+
+#### Personal Information
+
+- **Name**: Minimum 2 characters
+- **National ID**:
+  - Must be exactly 15 digits
+  - Must start with "784"
+  - Must include the year of birth (matches with Date of Birth)
+  - Automatically formats as you type (784-YYYY-XXXXXXX-X)
+- **Date of Birth**:
+  - Must be a valid date
+  - Age must be between 18 and 100 years
+- **Address**: Minimum 10 characters
+- **Phone**: 10-15 digits, automatically formatted
+- **Email**: Valid email format
+
+#### Family & Financial Information
+
+- **Dependents**: Minimum 0
+- **Monthly Income**: Minimum 0
+
+#### Situation Descriptions
+
+- **All text areas**: Minimum 10 characters
+- **AI Assistance**: Available for all description fields
 
 ### Step 2: Family & Financial Information
 
